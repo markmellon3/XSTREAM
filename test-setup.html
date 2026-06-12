@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xStream - Setup Diagnostic</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            padding: 40px;
+            min-height: 100vh;
+        }
+        .container { max-width: 700px; margin: 0 auto; }
+        h1 { 
+            color: #e63946; 
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle { color: #6b6b80; margin-bottom: 40px; }
+        
+        .test-item {
+            background: #14141c;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .test-item.pass { border-color: rgba(34,197,94,0.3); }
+        .test-item.fail { border-color: rgba(239,68,68,0.3); }
+        .test-item.loading { border-color: rgba(234,179,8,0.3); }
+        
+        .test-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .pass .test-icon { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .fail .test-icon { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .loading .test-icon { background: rgba(234,179,8,0.15); color: #eab308; }
+        
+        .test-info { flex: 1; }
+        .test-name { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+        .test-detail { color: #6b6b80; font-size: 13px; }
+        .fail .test-detail { color: #ef4444; }
+        
+        .error-box {
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 24px;
+            display: none;
+        }
+        .error-box h3 { color: #ef4444; margin-bottom: 12px; font-size: 16px; }
+        .error-box pre {
+            background: #0a0a0f;
+            padding: 16px;
+            border-radius: 8px;
+            color: #ef4444;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .summary {
+            background: #14141c;
+            border: 1px solid rgba(230,57,70,0.2);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 30px;
+            display: none;
+        }
+        .summary h2 { color: #e63946; margin-bottom: 16px; }
+        .summary ul { list-style: none; padding: 0; }
+        .summary li {
+            padding: 10px 0;
+            color: #b8b8cc;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            display: flex;
+            gap: 10px;
+        }
+        .summary li:last-child { border-bottom: none; }
+        .summary li::before { content: "→"; color: #e63946; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Setup Diagnostic</h1>
+        <p class="subtitle">Checking all dependencies for Forgot Password...</p>
+
+        <div id="tests">
+            <div class="test-item loading" id="test-firebase-app">
+                <div class="test-icon">⏳</div>
+                <div class="test-info">
+                    <div class="test-name">Firebase App SDK</div>
+                    <div class="test-detail">Loading...</div>
+                </div>
+            </div>
+
+            <div class="test-item loading" id="test-firebase-auth">
+                <div class="test-icon">⏳</div>
+                <div class="test-info">
+                    <div class="test-name">Firebase Auth SDK</div>
+                    <div class="test-detail">Loading...</div>
+                </div>
+            </div>
+
+            <div class="test-item loading" id="test-firebase-firestore">
+                <div class="test-icon">⏳</div>
+                <div class="test-info">
+                    <div class="test-name">Firebase Firestore SDK</div>
+                    <div class="test-detail">Loading...</div>
+                </div>
+            </div>
+
+            <div class="test-item loading" id="test-emailjs">
+                <div class="test-icon">⏳</div>
+                <div class="test-info">
+                    <div class="test-name">EmailJS SDK</div>
+                    <div class="test-detail">Loading...</div>
+                </div>
+            </div>
+
+            <div class="test-item loading" id="test-appjs">
+                <div class="test-icon">⏳</div>
+                <div class="test-info">
+                    <div class="test-name">app.js (Firebase Config)</div>
+                    <div class="test-detail">Loading...</div>
+                </div>
+            </div>
+
+            <div class="test-item loading" id="test-fpjs">
+                <div class="test-icon">⏳</div>
+                <div class="test-info">
+                    <div class="test-name">FP.js (Forgot Password Module)</div>
+                    <div class="test-detail">Loading...</div>
+                </div>
+            </div>
+
+            <div class="test-item loading" id="test-firebase-init">
+                <div class="test-icon">⏳</div>
+                <div class="test-info">
+                    <div class="test-name">Firebase Initialized</div>
+                    <div class="test-detail">Waiting for app.js...</div>
+                </div>
+            </div>
+
+            <div class="test-item loading" id="test-firestore-access">
+                <div class="test-icon">⏳</div>
+                <div class="test-info">
+                    <div class="test-name">Firestore Access</div>
+                    <div class="test-detail">Waiting for Firebase...</div>
+                </div>
+            </div>
+
+            <div class="test-item loading" id="test-emailjs-init">
+                <div class="test-icon">⏳</div>
+                <div class="test-info">
+                    <div class="test-name">EmailJS Initialized</div>
+                    <div class="test-detail">Waiting for EmailJS...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="error-box" id="error-box">
+            <h3>⚠️ Errors Found</h3>
+            <pre id="error-log"></pre>
+        </div>
+
+        <div class="summary" id="summary">
+            <h2>📋 Fix Instructions</h2>
+            <ul id="fix-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        var errors = [];
+        var fixes = [];
+        var testsCompleted = 0;
+        var totalTests = 9;
+
+        function updateTest(id, status, detail) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            
+            el.className = 'test-item ' + status;
+            var icon = status === 'pass' ? '✓' : status === 'fail' ? '✕' : '⏳';
+            el.querySelector('.test-icon').textContent = icon;
+            el.querySelector('.test-detail').textContent = detail;
+            
+            testsCompleted++;
+            if (testsCompleted >= totalTests) {
+                showSummary();
+            }
+        }
+
+        function addError(msg) {
+            errors.push(msg);
+            var box = document.getElementById('error-box');
+            var log = document.getElementById('error-log');
+            box.style.display = 'block';
+            log.textContent += msg + '\n\n';
+        }
+
+        function addFix(msg) {
+            fixes.push(msg);
+        }
+
+        function showSummary() {
+            var summary = document.getElementById('summary');
+            var list = document.getElementById('fix-list');
+            
+            if (fixes.length > 0) {
+                summary.style.display = 'block';
+                fixes.forEach(function(fix) {
+                    var li = document.createElement('li');
+                    li.textContent = fix;
+                    list.appendChild(li);
+                });
+            }
+        }
+
+        // Test 1: Firebase App SDK
+        setTimeout(function() {
+            if (typeof firebase !== 'undefined' && firebase.apps) {
+                updateTest('test-firebase-app', 'pass', 'Loaded successfully');
+            } else {
+                updateTest('test-firebase-app', 'fail', 'Failed to load');
+                addError('Firebase App SDK not loaded');
+                addFix('Check your internet connection');
+                addFix('Make sure the Firebase CDN URL is correct in login.html');
+                addFix('Try opening in a different browser or incognito mode');
+            }
+
+            // Test 2: Firebase Auth
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+                updateTest('test-firebase-auth', 'pass', 'Loaded successfully');
+            } else {
+                updateTest('test-firebase-auth', 'fail', 'Failed to load');
+                addError('Firebase Auth SDK not loaded');
+                addFix('Add: <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"><\/script>');
+            }
+
+            // Test 3: Firebase Firestore
+            if (typeof firebase !== 'undefined' && firebase.firestore) {
+                updateTest('test-firebase-firestore', 'pass', 'Loaded successfully');
+            } else {
+                updateTest('test-firebase-firestore', 'fail', 'Failed to load');
+                addError('Firebase Firestore SDK not loaded - THIS IS REQUIRED FOR PASSWORD RESET');
+                addFix('Add: <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"><\/script>');
+            }
+        }, 1000);
+
+        // Test 4: EmailJS
+        setTimeout(function() {
+            if (typeof emailjs !== 'undefined') {
+                updateTest('test-emailjs', 'pass', 'Loaded successfully (v' + (emailjs.VERSION || 'unknown') + ')');
+            } else {
+                updateTest('test-emailjs', 'fail', 'Failed to load');
+                addError('EmailJS SDK not loaded - EMAILS WILL NOT SEND');
+                addFix('Add: <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"><\/script>');
+            }
+        }, 1500);
+
+        // Test 5: app.js
+        setTimeout(function() {
+            if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
+                updateTest('test-appjs', 'pass', 'Firebase app initialized');
+            } else if (typeof firebase !== 'undefined') {
+                updateTest('test-appjs', 'fail', 'Firebase SDK loaded but app not initialized');
+                addError('app.js loaded but firebase.initializeApp() not called');
+                addFix('Open js/app.js and make sure firebase.initializeApp(config) is called');
+            } else {
+                updateTest('test-appjs', 'fail', 'Cannot check - Firebase SDK not loaded');
+            }
+        }, 2000);
+
+        // Test 6: FP.js
+        setTimeout(function() {
+            if (typeof ForgotPassword !== 'undefined') {
+                updateTest('test-fpjs', 'pass', 'Module loaded');
+            } else {
+                updateTest('test-fpjs', 'fail', 'Failed to load');
+                addError('FP.js not found');
+                addFix('Make sure js/FP.js file exists and path is correct');
+            }
+        }, 2500);
+
+        // Test 7: Firebase Initialized
+        setTimeout(function() {
+            try {
+                if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
+                    var app = firebase.apps[0];
+                    var name = app.name || '[DEFAULT]';
+                    updateTest('test-firebase-init', 'pass', 'App: ' + name);
+                } else {
+                    updateTest('test-firebase-init', 'fail', 'No Firebase app initialized');
+                }
+            } catch (e) {
+                updateTest('test-firebase-init', 'fail', 'Error: ' + e.message);
+            }
+        }, 3000);
+
+        // Test 8: Firestore Access
+        setTimeout(function() {
+            try {
+                if (typeof firebase !== 'undefined' && firebase.firestore) {
+                    var db = firebase.firestore();
+                    updateTest('test-firestore-access', 'pass', 'Firestore instance created');
+                } else {
+                    updateTest('test-firestore-access', 'fail', 'Firestore SDK not available');
+                }
+            } catch (e) {
+                updateTest('test-firestore-access', 'fail', 'Error: ' + e.message);
+                addError('Firestore access failed: ' + e.message);
+            }
+        }, 3500);
+
+        // Test 9: EmailJS Init
+        setTimeout(function() {
+            try {
+                if (typeof emailjs !== 'undefined') {
+                    emailjs.init('ZLpt6ZIylXN2cLQ1x');
+                    updateTest('test-emailjs-init', 'pass', 'Initialized with public key');
+                } else {
+                    updateTest('test-emailjs-init', 'fail', 'EmailJS SDK not loaded');
+                }
+            } catch (e) {
+                updateTest('test-emailjs-init', 'fail', 'Error: ' + e.message);
+                addError('EmailJS init failed: ' + e.message);
+            }
+        }, 4000);
+    </script>
+
+    <!-- Load scripts AFTER test page renders -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+   <script src="config.js"></script>
+<script src="js/app.js"></script>
+    <script src="js/FP.js"></script>
+</body>
+</html>

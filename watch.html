@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="Watch this series on Xstream.">
+  <title>Watch Series — Xstream</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/watch.css">
+</head>
+<body data-page="series-watch">
+
+  <div id="toast-container"></div>
+  <nav id="main-nav" class="navbar"></nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-overlay" class="mobile-overlay"></div>
+  <div id="mobile-menu" class="mobile-menu"></div>
+
+  <main class="video-page-main" id="watch-page-content">
+    <div class="video-page-grid">
+
+      <!-- Left Column: Player + Info + Episodes -->
+      <div class="video-player-col">
+
+        <!-- HERO SECTION: Full Poster Background with Player & Info -->
+        <div id="watch-header">
+          <div class="skeleton skeleton-player" style="position:absolute;inset:0;z-index:0;border-radius:0;"></div>
+        </div>
+
+        <!-- Seasons & Episodes -->
+        <div id="seasons-container" style="margin: 0 24px;">
+          <h2 class="seasons-container-header">Seasons & Episodes</h2>
+          <div id="season-tabs">
+            <div class="skeleton skeleton-text" style="height:42px;width:200px;margin-bottom:12px;border-radius:8px;"></div>
+            <div class="skeleton skeleton-text" style="height:42px;width:180px;margin-bottom:12px;border-radius:8px;"></div>
+          </div>
+          <div id="episode-list">
+            <div class="skeleton skeleton-text" style="height:76px;margin-bottom:6px;border-radius:8px;"></div>
+            <div class="skeleton skeleton-text" style="height:76px;margin-bottom:6px;border-radius:8px;"></div>
+            <div class="skeleton skeleton-text" style="height:76px;margin-bottom:6px;border-radius:8px;"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Related Series -->
+      <aside class="related-sidebar">
+        <div class="related-series-section">
+          <h3 class="related-title">Related Series</h3>
+          <div id="related-series" class="related-list">
+            <div class="skeleton-widget-item"><div class="skeleton skeleton-widget-thumb"></div><div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text short"></div></div></div>
+            <div class="skeleton-widget-item"><div class="skeleton skeleton-widget-thumb"></div><div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text short"></div></div></div>
+            <div class="skeleton-widget-item"><div class="skeleton skeleton-widget-thumb"></div><div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text short"></div></div></div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- Not Found State -->
+    <div id="video-not-found" class="empty-state" style="display:none; grid-column:1/-1;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="64" height="64"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+      <h3>Series Not Found</h3>
+      <p>This series may have been removed or doesn't exist.</p>
+      <a href="series.html" class="btn-accent" style="margin-top:16px;">Browse Series</a>
+    </div>
+  </main>
+
+  <footer id="main-footer" class="footer"></footer>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script src="config.js"></script>
+<script src="js/app.js"></script>
+<script src="js/series.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="description" content="Verify your email to complete xStream signup.">
+  <title>Verify Email — xStream</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  
+  <style>
+    /* Scoped strictly to the verification page for dark mode */
+    body[data-page="verification"] .otp-inputs {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin: 25px 0;
+    }
+
+    body[data-page="verification"] .otp-input {
+      width: 60px;
+      height: 68px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      font-family: 'Poppins', sans-serif;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      color: #ffffff;
+      transition: all 0.3s ease;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+
+    body[data-page="verification"] .otp-input::-webkit-outer-spin-button,
+    body[data-page="verification"] .otp-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    body[data-page="verification"] .otp-input:focus {
+      border-color: #e63946;
+      background: rgba(255, 255, 255, 0.07);
+      box-shadow: 0 0 0 4px rgba(230, 57, 70, 0.15);
+      transform: translateY(-2px);
+    }
+
+    body[data-page="verification"] .otp-input.filled {
+      border-color: #e63946;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    body[data-page="verification"] .otp-input.error {
+      border-color: #ff4757;
+      animation: shake 0.5s ease;
+    }
+
+    body[data-page="verification"] .otp-input.success {
+      border-color: #2ed573;
+      background: rgba(46, 213, 115, 0.1);
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+
+    body[data-page="verification"] .otp-email-display {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin: 20px 0;
+      text-align: center;
+      font-weight: 500;
+      color: #aaaaaa;
+      font-size: 15px;
+    }
+
+    body[data-page="verification"] .otp-email-display strong {
+      color: #e63946;
+      font-weight: 600;
+    }
+
+    body[data-page="verification"] .otp-timer {
+      text-align: center;
+      color: #888888;
+      font-size: 14px;
+      margin-top: 15px;
+      min-height: 20px;
+    }
+
+    body[data-page="verification"] .otp-timer .countdown {
+      font-weight: 600;
+      color: #e63946;
+    }
+
+    body[data-page="verification"] .otp-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    body[data-page="verification"] .otp-verify-btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #e63946 0%, #ff6b6b 100%);
+      color: #fff;
+    }
+
+    body[data-page="verification"] .otp-verify-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(230, 57, 70, 0.35);
+    }
+
+    body[data-page="verification"] .otp-verify-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    body[data-page="verification"] .otp-resend-btn {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #e63946;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 500;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: transparent;
+      color: #e63946;
+    }
+
+    body[data-page="verification"] .otp-resend-btn:hover:not(:disabled) {
+      background: #e63946;
+      color: #fff;
+    }
+
+    body[data-page="verification"] .otp-resend-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    body[data-page="verification"] .otp-back-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 500;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: transparent;
+      color: #888888;
+    }
+
+    body[data-page="verification"] .otp-back-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    body[data-page="verification"] .otp-spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: otp-spin 0.8s linear infinite;
+    }
+
+    @keyframes otp-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    body[data-page="verification"] .otp-message {
+      text-align: center;
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-top: 15px;
+      font-size: 14px;
+      font-weight: 500;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    body[data-page="verification"] .otp-message.show {
+      display: block;
+    }
+
+    body[data-page="verification"] .otp-message.error {
+      background: rgba(255, 71, 87, 0.1);
+      color: #ff6b6b;
+      border: 1px solid rgba(255, 71, 87, 0.3);
+    }
+
+    body[data-page="verification"] .otp-message.success {
+      background: rgba(46, 213, 115, 0.1);
+      color: #2ed573;
+      border: 1px solid rgba(46, 213, 115, 0.3);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    body[data-page="verification"] .otp-illustration {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    body[data-page="verification"] .otp-illustration svg {
+      width: 90px;
+      height: 90px;
+    }
+
+    /* Success state overlay */
+    body[data-page="verification"] .otp-success-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #16161c;
+      border-radius: inherit;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      z-index: 10;
+      animation: fadeIn 0.5s ease;
+    }
+
+    body[data-page="verification"] .otp-success-overlay.show {
+      display: flex;
+    }
+
+    body[data-page="verification"] .success-checkmark {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      animation: scaleIn 0.5s ease;
+    }
+
+    @keyframes scaleIn {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    body[data-page="verification"] .success-checkmark svg {
+      width: 40px;
+      height: 40px;
+      color: #fff;
+    }
+
+    body[data-page="verification"] .redirect-text {
+      color: #888888;
+      font-size: 14px;
+      margin-top: 15px;
+    }
+
+    body[data-page="verification"] .redirect-text .countdown {
+      font-weight: 600;
+      color: #e63946;
+    }
+  </style>
+</head>
+<body data-page="verification">
+
+  <div id="toast-container"></div>
+  <nav id="main-nav" class="navbar"></nav>
+
+  <main class="auth-page">
+    <div class="auth-bg-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+    
+    <div class="auth-container">
+      <div class="auth-card" style="position: relative; overflow: hidden;">
+        
+        <!-- Success Overlay -->
+        <div class="otp-success-overlay" id="success-overlay">
+          <div class="success-checkmark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h2 style="margin-bottom: 8px; color: #ffffff;">Email Verified!</h2>
+          <p style="color: #aaaaaa;">Your account has been created successfully</p>
+          <p class="redirect-text">Redirecting in <span class="countdown" id="redirect-countdown">3</span> seconds...</p>
+        </div>
+
+        <!-- OTP Verification Content -->
+        <div class="auth-header">
+          <a href="index.html" class="auth-logo">
+            <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#e63946"/><path d="M13 10l10 6-10 6V10z" fill="#fff"/></svg>
+            xStream
+          </a>
+          <h1>Verify Your Email</h1>
+          <p>We've sent a 4-digit code to your email</p>
+        </div>
+
+        <!-- Email Display -->
+        <div class="otp-email-display">
+          Code sent to <strong id="display-email">loading...</strong>
+        </div>
+
+        <!-- OTP Illustration -->
+        <div class="otp-illustration">
+          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="60" r="55" fill="rgba(230, 57, 70, 0.05)" stroke="#e63946" stroke-width="2" stroke-dasharray="8 4"/>
+            <rect x="30" y="40" width="60" height="40" rx="6" fill="#1e1e1e" stroke="#e63946" stroke-width="2.5"/>
+            <path d="M30 46L60 66L90 46" stroke="#e63946" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="85" cy="35" r="18" fill="#e63946"/>
+            <text x="85" y="41" text-anchor="middle" fill="#fff" font-size="16" font-weight="700" font-family="Poppins">4</text>
+          </svg>
+        </div>
+
+        <!-- OTP Inputs -->
+        <div class="otp-inputs" id="otp-inputs">
+          <input type="text" class="otp-input" maxlength="1" id="otp-1" inputmode="numeric" autocomplete="one-time-code">
+          <input type="text" class="otp-input" maxlength="1" id="otp-2" inputmode="numeric">
+          <input type="text" class="otp-input" maxlength="1" id="otp-3" inputmode="numeric">
+          <input type="text" class="otp-input" maxlength="1" id="otp-4" inputmode="numeric">
+        </div>
+
+        <!-- Message -->
+        <div class="otp-message" id="otp-message"></div>
+
+        <!-- Timer -->
+        <div class="otp-timer" id="otp-timer"></div>
+
+        <!-- Actions -->
+        <div class="otp-actions">
+          <button class="otp-verify-btn" id="verify-btn" disabled>
+            <span class="btn-text">Verify Code</span>
+            <div class="otp-spinner" style="display:none;"></div>
+          </button>
+          
+          <button class="otp-resend-btn" id="resend-btn" style="display:none;">
+            Resend Code
+          </button>
+          
+          <button class="otp-back-btn" id="back-btn">
+            ← Back to Signup
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer id="main-footer" class="footer"></footer>
+
+  <!-- Firebase SDKs — Updated to 10.12.2 to match app.js -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <!-- Duplicate-app guard: MUST run BEFORE app.js -->
+  <script>
+    (function () {
+      var _orig = firebase.initializeApp;
+      firebase.initializeApp = function (opts, name) {
+        try {
+          return _orig.call(firebase, opts, name);
+        } catch (e) {
+          if (e.code === 'app/duplicate-app') {
+            console.warn('[Firebase] Duplicate init caught — reusing existing app.');
+            return firebase.app(name);
+          }
+          throw e;
+        }
+      };
+    })();
+  </script>
+  
+  <!-- EmailJS for sending emails -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  
+  <!-- Your JS files in perfect order -->
+  <script src="js/optimizer.js"></script>
+  <script src="js/threat.js"></script>
+  <script src="config.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/otp.js"></script>
+</body>
+</html>

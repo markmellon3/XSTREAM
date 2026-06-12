@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="description" content="Watch this Movie on Xstream.">
+  <title>Watch movie — Xstream</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="video">
+
+  <div id="toast-container"></div>
+  <nav id="main-nav" class="navbar"></nav>
+
+  <main class="video-page-main">
+    <div class="video-page-grid">
+
+      <!-- Video Player Column -->
+      <div class="video-player-col">
+        <!-- Player -->
+        <div class="video-player-wrapper" id="video-player-wrapper">
+          <div class="skeleton skeleton-player"></div>
+        </div>
+
+        <!-- Video Info -->
+        <div class="video-info" id="video-info" style="display:none;">
+          <h1 class="video-title" id="video-title"></h1>
+          <div class="video-meta">
+            <div class="video-stats">
+              <span class="stat-item" id="video-views">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>0 views</span>
+              </span>
+              <span class="stat-item" id="video-date">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                <span></span>
+              </span>
+              <span class="stat-item" id="video-country-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <span></span>
+              </span>
+            </div>
+            <div class="video-actions">
+          <button class="action-btn" id="like-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+  <span id="like-count">0</span>
+</button>
+<button class="action-btn" id="dislike-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+  <span id="dislike-count">0</span>
+</button>
+<button class="action-btn" id="share-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+  Share
+</button>
+<button class="action-btn" id="favourite-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+  <span id="favourite-label">Favourite</span>
+</button>
+<button class="action-btn" id="download-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 8 12 3 17 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+  Download
+</button>
+</div>
+</div>
+          <div class="video-description-box">
+            <p id="video-description"></p>
+          </div>
+        </div>
+
+        <!-- Video Not Found -->
+        <div id="video-not-found" class="empty-state" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          <h3>Movie Not Found</h3>
+          <p>This video may have been removed or doesn't exist.</p>
+          <a href="index.html" class="btn-accent">Back to Home</a>
+        </div>
+      </div>
+
+      <!-- Related Videos Sidebar -->
+      <aside class="related-sidebar">
+        <h3 class="related-title">Related Videos</h3>
+        <div id="related-videos" class="related-list">
+          <div class="skeleton-widget-item"><div class="skeleton skeleton-widget-thumb"></div><div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text short"></div></div></div>
+          <div class="skeleton-widget-item"><div class="skeleton skeleton-widget-thumb"></div><div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text short"></div></div></div>
+          <div class="skeleton-widget-item"><div class="skeleton skeleton-widget-thumb"></div><div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text short"></div></div></div>
+          <div class="skeleton-widget-item"><div class="skeleton skeleton-widget-thumb"></div><div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text short"></div></div></div>
+          <div class="skeleton-widget-item"><div class="skeleton skeleton-widget-thumb"></div><div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text short"></div></div></div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer id="main-footer" class="footer"></footer>
+   <!-- Offline Manager (load after main app.js) -->
+ <script src="js/offline-manager.js"></script>
+ 
+ <!-- Register Service Worker -->
+ <script>
+   if ('serviceWorker' in navigator) {
+     window.addEventListener('load', function() {
+       navigator.serviceWorker.register('/sw.js').catch(function(err) {
+         console.warn('SW registration failed:', err);
+       });
+     });
+   }
+ </script>
+<script src="js/optimizer.js"></script>
+<script src="js/threat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

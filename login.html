@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="Sign in to your xStream Movies account.">
+  <title>Sign In — XSTREAM MOVIES</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="login">
+
+  <div id="toast-container"></div>
+  <nav id="main-nav" class="navbar"></nav>
+
+  <main class="auth-page">
+    <div class="auth-bg-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-header">
+          <a href="index.html" class="auth-logo">
+            <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#e63946"/><path d="M13 10l10 6-10 6V10z" fill="#fff"/></svg>
+            xStream Movies
+          </a>
+          <h1>Welcome Back</h1>
+          <p>Sign in to your account to continue</p>
+        </div>
+
+        <!-- Google Sign In -->
+        <button type="button" class="btn-google" id="google-login-btn">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Sign in with Google
+        </button>
+
+        <!-- Divider -->
+        <div class="auth-divider">
+          <span>or continue with email</span>
+        </div>
+
+        <form id="login-form" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="login-email">Email Address <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              <input type="email" id="login-email" placeholder="you@example.com" required autocomplete="email">
+            </div>
+            <span class="form-error" id="login-email-error"></span>
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <input type="password" id="login-password" placeholder="Enter your password" required autocomplete="current-password">
+              <button type="button" class="toggle-password" data-target="login-password">
+                <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
+            <span class="form-error" id="login-password-error"></span>
+          </div>
+          <div class="form-row">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remember-me">
+              <span class="checkmark"></span>
+              Remember me
+            </label>
+            <button type="button" id="forgot-password-btn" class="link-btn">Forgot password?</button>
+          </div>
+          <button type="submit" class="btn-accent btn-full btn-lg" id="login-submit">
+            <span class="btn-text">Sign In</span>
+            <div class="btn-spinner" style="display:none;"></div>
+          </button>
+        </form>
+        <div class="auth-footer">
+          <p>Don't have an account? <a href="signup.html" class="link-accent">Create one</a></p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgot-modal" class="modal-overlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Reset Password</h3>
+        <button class="modal-close" id="close-forgot-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Enter your email address and we'll send you a link to reset your password.</p>
+        <form id="forgot-form" novalidate>
+          <div class="form-group">
+            <label for="forgot-email">Email Address <span class="required">*</span></label>
+            <input type="email" id="forgot-email" placeholder="you@example.com" class="input" required autocomplete="email">
+            <span class="form-error" id="forgot-email-error"></span>
+          </div>
+          <button type="submit" class="btn-accent btn-full" id="forgot-submit">
+            <span class="btn-text">Send Reset Link</span>
+            <div class="btn-spinner" style="display:none;"></div>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer id="main-footer" class="footer"></footer>
+
+  <!-- Security Scripts -->
+  <script src="js/optimizer.js"></script>
+  <script src="js/threat.js"></script>
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <!-- Forgot Password Module - with guard -->
+<script>
+  if (typeof ForgotPassword === 'undefined') {
+    document.write('<script src="js/FP.js"><\/script>');
+  } else {
+    console.log('[Guard] FP.js already loaded, skipping');
+  }
+</script>
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  
+  <!-- App Config (Must load before FP.js) -->
+ <script src="config.js"></script>
+<script src="js/app.js"></script>
+  
+  <!-- Forgot Password Module -->
+  <script src="js/FP.js"></script>
+
+  <!-- Security Scripts -->
+  <script src="js/optimizer.js"></script>
+  <script src="js/threat.js"></script>
+  
+  <!-- Firebase SDKs - Load in order -->
+  <script>
+    console.log('%c[Loading] Firebase App SDK...', 'color: #eab308');
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" 
+          onerror="console.error('%c[ERROR] Firebase App SDK failed to load!', 'color: #ef4444');"></script>
+  
+  <script>
+    if (typeof firebase !== 'undefined') {
+      console.log('%c[OK] Firebase App SDK loaded', 'color: #22c55e');
+      console.log('%c[Loading] Firebase Auth SDK...', 'color: #eab308');
+    } else {
+      console.error('%c[ERROR] Firebase is undefined after loading SDK!', 'color: #ef4444');
+    }
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"
+          onerror="console.error('%c[ERROR] Firebase Auth SDK failed to load!', 'color: #ef4444');"></script>
+  
+  <script>
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+      console.log('%c[OK] Firebase Auth SDK loaded', 'color: #22c55e');
+      console.log('%c[Loading] Firebase Firestore SDK...', 'color: #eab308');
+    }
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"
+          onerror="console.error('%c[ERROR] Firebase Firestore SDK failed to load!', 'color: #ef4444');"></script>
+  
+  <script>
+    if (typeof firebase !== 'undefined' && firebase.firestore) {
+      console.log('%c[OK] Firebase Firestore SDK loaded', 'color: #22c55e');
+      console.log('%c[Loading] EmailJS SDK...', 'color: #eab308');
+    }
+  </script>
+  
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"
+          onerror="console.error('%c[ERROR] EmailJS SDK failed to load!', 'color: #ef4444');"></script>
+  
+  <script>
+    if (typeof emailjs !== 'undefined') {
+      console.log('%c[OK] EmailJS SDK loaded', 'color: #22c55e');
+      console.log('%c[Loading] app.js...', 'color: #eab308');
+    } else {
+      console.error('%c[ERROR] EmailJS is undefined!', 'color: #ef4444');
+    }
+  </script>
+  
+  <!-- App Config (Must load before FP.js) -->
+  <script src="js/app.js" 
+          onerror="console.error('%c[ERROR] app.js failed to load! Check file exists.', 'color: #ef4444');"></script>
+  
+  <script>
+    if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
+      console.log('%c[OK] Firebase app initialized:', 'color: #22c55e', firebase.apps[0].name);
+      console.log('%c[Loading] FP.js...', 'color: #eab308');
+    } else {
+      console.error('%c[ERROR] Firebase app NOT initialized! Check app.js', 'color: #ef4444');
+    }
+  </script>
+  
+  <!-- Forgot Password Module -->
+  <script src="js/FP.js"
+          onerror="console.error('%c[ERROR] FP.js failed to load! Check file exists.', 'color: #ef4444');"></script>
+  
+  <script>
+    if (typeof ForgotPassword !== 'undefined') {
+      console.log('%c[OK] FP.js loaded', 'color: #22c55e');
+    } else {
+      console.error('%c[ERROR] ForgotPassword module not found!', 'color: #ef4444');
+    }
+  </script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('%c[Init] Starting login page...', 'color: #3b82f6');
+    
+    // Check prerequisites
+    if (typeof firebase === 'undefined') {
+      console.error('%c[FATAL] Firebase not loaded! Cannot continue.', 'color: #ef4444; font-size: 14px');
+      alert('Error: Firebase failed to load. Please refresh the page or check your internet connection.');
+      return;
+    }
+    
+    if (typeof firebase.apps === 'undefined' || firebase.apps.length === 0) {
+      console.error('%c[FATAL] Firebase app not initialized! Check app.js', 'color: #ef4444; font-size: 14px');
+      alert('Error: Firebase not configured. Please contact support.');
+      return;
+    }
+    
+    if (typeof emailjs === 'undefined') {
+      console.error('%c[WARNING] EmailJS not loaded! Forgot password will not work.', 'color: #eab308; font-size: 14px');
+    }
+    
+    console.log('%c[Init] All prerequisites met. Initializing modules...', 'color: #22c55e');
+    
+    // Initialize Forgot Password Module
+    if (typeof ForgotPassword !== 'undefined') {
+      ForgotPassword.init({
+        emailjs: {
+          serviceId: 'service_u2dgzc9',
+          templateId: 'template_v4jol0c',
+          publicKey: 'ZLpt6ZIylXN2cLQ1x'
+        },
+        pages: {
+          resetPasswordUrl: '/reset-password.html'
+        }
+      });
+      console.log('%c[Init] ForgotPassword module initialized', 'color: #22c55e');
+    }
+
+    // ============================================
+    // LOGIN FORM HANDLING
+    // ============================================
+    var loginForm = document.getElementById('login-form');
+    var loginEmail = document.getElementById('login-email');
+    var loginPassword = document.getElementById('login-password');
+    var loginSubmit = document.getElementById('login-submit');
+    var googleBtn = document.getElementById('google-login-btn');
+
+    function showFieldError(fieldId, message) {
+      var errorEl = document.getElementById(fieldId + '-error');
+      var field = document.getElementById(fieldId);
+      if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+      }
+      if (field) {
+        field.classList.add('input-error');
+      }
+    }
+
+    function clearFieldErrors(prefix) {
+      document.querySelectorAll('[id^="' + prefix + '"][id$="-error"]').forEach(function(el) {
+        el.textContent = '';
+        el.style.display = 'none';
+      });
+      document.querySelectorAll('.input-error').forEach(function(el) {
+        el.classList.remove('input-error');
+      });
+    }
+
+    function setLoginLoading(isLoading) {
+      if (loginSubmit) {
+        var btnText = loginSubmit.querySelector('.btn-text');
+        var btnSpinner = loginSubmit.querySelector('.btn-spinner');
+        
+        loginSubmit.disabled = isLoading;
+        if (btnText) btnText.style.display = isLoading ? 'none' : 'inline';
+        if (btnSpinner) btnSpinner.style.display = isLoading ? 'block' : 'none';
+      }
+    }
+
+    // Email/Password Login
+    if (loginForm) {
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        clearFieldErrors('login');
+
+        var email = loginEmail.value.trim();
+        var password = loginPassword.value;
+        var hasError = false;
+
+        if (!email) {
+          showFieldError('login-email', 'Email is required');
+          hasError = true;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          showFieldError('login-email', 'Please enter a valid email address');
+          hasError = true;
+        }
+
+        if (!password) {
+          showFieldError('login-password', 'Password is required');
+          hasError = true;
+        } else if (password.length < 6) {
+          showFieldError('login-password', 'Password must be at least 6 characters');
+          hasError = true;
+        }
+
+        if (hasError) return;
+
+        setLoginLoading(true);
+
+        firebase.auth().signInWithEmailAndPassword(email, password)
+          .then(function(userCredential) {
+            setLoginLoading(false);
+            
+            if (userCredential.user && !userCredential.user.emailVerified) {
+              showToast('Please verify your email before signing in.', 'warning');
+              firebase.auth().signOut();
+              return;
+            }
+
+            showToast('Welcome back!', 'success');
+            setTimeout(function() {
+              window.location.href = 'index.html';
+            }, 1000);
+          })
+          .catch(function(error) {
+            setLoginLoading(false);
+            
+            switch (error.code) {
+              case 'auth/user-not-found':
+                showFieldError('login-email', 'No account found with this email');
+                break;
+              case 'auth/wrong-password':
+              case 'auth/invalid-credential':
+                showFieldError('login-password', 'Incorrect password');
+                break;
+              case 'auth/too-many-requests':
+                showToast('Too many failed attempts. Please try again later.', 'error');
+                break;
+              case 'auth/user-disabled':
+                showToast('This account has been disabled.', 'error');
+                break;
+              case 'auth/invalid-email':
+                showFieldError('login-email', 'Invalid email address');
+                break;
+              default:
+                showToast('Login failed. Please try again.', 'error');
+            }
+          });
+      });
+    }
+
+    // Google Sign In
+    if (googleBtn) {
+      googleBtn.addEventListener('click', function() {
+        var provider = new firebase.auth.GoogleAuthProvider();
+        
+        googleBtn.disabled = true;
+        googleBtn.innerHTML = '<div style="display:inline-block;width:18px;height:18px;border:2px solid rgba(0,0,0,0.2);border-top-color:#000;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:8px;"></div> Connecting...';
+
+        firebase.auth().signInWithPopup(provider)
+          .then(function(result) {
+            showToast('Welcome to xStream!', 'success');
+            setTimeout(function() {
+              window.location.href = 'index.html';
+            }, 1000);
+          })
+          .catch(function(error) {
+            googleBtn.disabled = false;
+            googleBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> Sign in with Google';
+            
+            if (error.code !== 'auth/popup-closed-by-user') {
+              showToast('Google sign-in failed. Please try again.', 'error');
+            }
+          });
+      });
+    }
+
+    // Toggle Password Visibility
+    document.querySelectorAll('.toggle-password').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var targetId = this.getAttribute('data-target');
+        var input = document.getElementById(targetId);
+        var eyeOpen = this.querySelector('.eye-open');
+        var eyeClosed = this.querySelector('.eye-closed');
+        
+        if (input.type === 'password') {
+          input.type = 'text';
+          if (eyeOpen) eyeOpen.style.display = 'none';
+          if (eyeClosed) eyeClosed.style.display = 'block';
+        } else {
+          input.type = 'password';
+          if (eyeOpen) eyeOpen.style.display = 'block';
+          if (eyeClosed) eyeClosed.style.display = 'none';
+        }
+      });
+    });
+
+    // Auth State Observer
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user && user.emailVerified) {
+        if (window.location.pathname.includes('login')) {
+          window.location.href = 'index.html';
+        }
+      }
+    });
+
+    console.log('%c[Init] Login page ready!', 'color: #22c55e; font-weight: bold');
+  });
+  </script>
+</body>
+</html>
