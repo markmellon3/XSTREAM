@@ -3651,14 +3651,10 @@ function clearWatchHistory(uid) {
 
  
 
-
-
 /* =============================================
-   View All Page — Both Nodes, No Pagination
-   Reads from "description" + "Translated" + "Series"
+   View All Page — No Pagination
+   Reads from "description" + "Translated" ONLY
    ============================================= */
-var isViewAllInitialized = false;
-
 var VIEWALL_STATE = {
   allVideos: [],
   currentCategory: 'all',
@@ -3667,8 +3663,8 @@ var VIEWALL_STATE = {
 };
 
 function initViewAllPage() {
-  if (isViewAllInitialized) return;
-  isViewAllInitialized = true;
+  var grid = document.getElementById('videos-grid');
+  if (!grid) return;
   
   var loadMoreBtn = document.getElementById('load-more-btn');
   var catFilter = document.getElementById('category-filter');
@@ -3680,35 +3676,37 @@ function initViewAllPage() {
   /* Read URL params */
   var urlParams = new URLSearchParams(window.location.search);
   VIEWALL_STATE.currentYear = urlParams.get('year') || '';
-  VIEWALL_STATE.currentCategory = AppState.currentCategory || 'all';
-  VIEWALL_STATE.currentSort = AppState.currentSort || 'recent';
+  VIEWALL_STATE.currentCategory = 'all';
+  VIEWALL_STATE.currentSort = 'recent';
+  
+  var urlSort = urlParams.get('sort');
+  var urlCat = urlParams.get('category');
+  if (urlSort) VIEWALL_STATE.currentSort = urlSort;
+  if (urlCat) VIEWALL_STATE.currentCategory = urlCat;
   
   if (catFilter) catFilter.value = VIEWALL_STATE.currentCategory;
   if (sortFilter) sortFilter.value = VIEWALL_STATE.currentSort;
   
   /* Update page header if filtering by year */
   if (VIEWALL_STATE.currentYear) {
-    var pageTitle = document.getElementById('viewall-page-title');
-    var pageSubtitle = document.getElementById('viewall-page-subtitle');
-    var breadcrumbCurrent = document.getElementById('breadcrumb-current');
-    var title = document.getElementById('viewall-title');
-    
-    if (pageTitle) pageTitle.textContent = 'Movies from ' + VIEWALL_STATE.currentYear;
-    if (pageSubtitle) pageSubtitle.textContent = 'Browse all movies released in ' + VIEWALL_STATE.currentYear + '.';
-    if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'Year: ' + VIEWALL_STATE.currentYear;
-    if (title) title.innerHTML = '<svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Movies from ' + VIEWALL_STATE.currentYear;
-    
+    setViewAllHeader(
+      'Movies from ' + VIEWALL_STATE.currentYear,
+      'Browse all movies released in ' + VIEWALL_STATE.currentYear + '.',
+      'Year: ' + VIEWALL_STATE.currentYear
+    );
+    showActiveFilterChips();
+  } else {
+    resetViewAllHeader();
     showActiveFilterChips();
   }
   
-  /* Fetch from all nodes, then render */
+  /* Fetch from nodes, then render (uses cache if available for SPA speed) */
   fetchFromBothNodes();
   
   /* ---- Category ---- */
   if (catFilter) {
     catFilter.addEventListener('change', function() {
       VIEWALL_STATE.currentCategory = catFilter.value;
-      AppState.currentCategory = catFilter.value;
       filterAndRender();
       showActiveFilterChips();
     });
@@ -3718,7 +3716,6 @@ function initViewAllPage() {
   if (sortFilter) {
     sortFilter.addEventListener('change', function() {
       VIEWALL_STATE.currentSort = sortFilter.value;
-      AppState.currentSort = sortFilter.value;
       filterAndRender();
     });
   }
@@ -3730,24 +3727,42 @@ function initViewAllPage() {
       VIEWALL_STATE.currentCategory = 'all';
       VIEWALL_STATE.currentSort = 'recent';
       VIEWALL_STATE.currentYear = '';
-      AppState.currentCategory = 'all';
-      AppState.currentSort = 'recent';
       if (catFilter) catFilter.value = 'all';
       if (sortFilter) sortFilter.value = 'recent';
       
-      /* Reset header back to default */
-      var pageTitle = document.getElementById('viewall-page-title');
-      var pageSubtitle = document.getElementById('viewall-page-subtitle');
-      var breadcrumbCurrent = document.getElementById('breadcrumb-current');
-      var title = document.getElementById('viewall-title');
-      if (pageTitle) pageTitle.textContent = 'All Movies';
-      if (pageSubtitle) pageSubtitle.textContent = 'Browse the complete collection of Movies from creators worldwide.';
-      if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'All Movies';
-      if (title) title.innerHTML = '<svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> All Movies';
-      
+      resetViewAllHeader();
       filterAndRender();
       showActiveFilterChips();
     });
+  }
+}
+
+/* -------------------------------------------------------
+   Header Helpers
+   ------------------------------------------------------- */
+function setViewAllHeader(title, subtitle, breadcrumb) {
+  var pageTitle = document.getElementById('viewall-page-title');
+  var pageSubtitle = document.getElementById('viewall-page-subtitle');
+  var breadcrumbCurrent = document.getElementById('breadcrumb-current');
+  var titleEl = document.getElementById('viewall-title');
+  
+  if (pageTitle) pageTitle.textContent = title;
+  if (pageSubtitle) pageSubtitle.textContent = subtitle;
+  if (breadcrumbCurrent) breadcrumbCurrent.textContent = breadcrumb;
+  if (titleEl) {
+    titleEl.innerHTML = '<svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ' + escapeHTML(title);
+  }
+}
+
+function resetViewAllHeader() {
+  setViewAllHeader(
+    'All Movies',
+    'Browse the complete collection of Movies from creators worldwide.',
+    'All Movies'
+  );
+  var titleEl = document.getElementById('viewall-title');
+  if (titleEl) {
+    titleEl.innerHTML = '<svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> All Movies';
   }
 }
 
@@ -3783,23 +3798,13 @@ function showActiveFilterChips() {
 
 function removeYearFilter() {
   VIEWALL_STATE.currentYear = '';
-  
-  var pageTitle = document.getElementById('viewall-page-title');
-  var pageSubtitle = document.getElementById('viewall-page-subtitle');
-  var breadcrumbCurrent = document.getElementById('breadcrumb-current');
-  var title = document.getElementById('viewall-title');
-  if (pageTitle) pageTitle.textContent = 'All Movies';
-  if (pageSubtitle) pageSubtitle.textContent = 'Browse the complete collection of Movies from creators worldwide.';
-  if (breadcrumbCurrent) breadcrumbCurrent.textContent = 'All Movies';
-  if (title) title.innerHTML = '<svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> All Movies';
-  
+  resetViewAllHeader();
   filterAndRender();
   showActiveFilterChips();
 }
 
 function removeCategoryFilter() {
   VIEWALL_STATE.currentCategory = 'all';
-  AppState.currentCategory = 'all';
   var catFilter = document.getElementById('category-filter');
   if (catFilter) catFilter.value = 'all';
   filterAndRender();
@@ -3808,29 +3813,34 @@ function removeCategoryFilter() {
 
 /* -------------------------------------------------------
    fetchFromBothNodes
-   Fires three parallel reads, merges into one array.
+   Fires two parallel reads (description + Translated),
+   merges into one array. Series are completely excluded.
    ------------------------------------------------------- */
 function fetchFromBothNodes() {
   var grid = document.getElementById('videos-grid');
   if (!grid) return;
   
+  /* If we already fetched data (e.g. navigating back via SPA), just re-render */
+  if (VIEWALL_STATE.allVideos.length > 0) {
+    filterAndRender();
+    return;
+  }
+  
   var dbRef = (typeof database !== 'undefined' && database) ? database : firebase.database();
   
   var p1 = dbRef.ref('description').once('value');
   var p2 = dbRef.ref('Translated').once('value');
-  var p3 = dbRef.ref('Series').once('value');
   
-  Promise.all([p1, p2, p3]).then(function(results) {
+  Promise.all([p1, p2]).then(function(results) {
     VIEWALL_STATE.allVideos = [];
     var seenIds = {};
-    var nodeNames = ['description', 'Translated', 'Series'];
+    var nodeNames = ['description', 'Translated'];
     
-    /* Loop through each of the 3 snapshots */
+    /* Loop through the 2 snapshots */
     for (var i = 0; i < results.length; i++) {
       var snapshot = results[i];
       var source = nodeNames[i];
       
-      /* Loop through the children INSIDE this snapshot */
       snapshot.forEach(function(child) {
         if (source === 'description' && child.key === 'Translated') return; // skip container
         var data = child.val();
@@ -3922,7 +3932,6 @@ function filterAndRender() {
   
   if (typeof initLazyLoading === 'function') initLazyLoading();
 }
-
 /* =============================================
    Profile Page
    ============================================= */
