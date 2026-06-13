@@ -276,7 +276,7 @@ function buildNavigation() {
   nav.innerHTML = '<div class="nav-inner">' +
    '<a href="index.html" class="nav-logo">' +
    '<img src="https://ik.imagekit.io/s95tumxuk/IMG_2611.png?updatedAt=1780340137129" alt="XSTREAM Logo" class="nav-logo-img">' +
-   'XSTREAM ' +
+   'XSTRΞAM ' +
    '</a>' +
    '<div class="nav-links">' + linksHTML + '</div>' +
    '<div class="nav-actions">' +
@@ -464,7 +464,7 @@ function buildFooter() {
         '<div class="footer-brand">' +
         '<a href="index.html" class="nav-logo">' +
         '<img src="https://ik.imagekit.io/s95tumxuk/IMG_2611.png?updatedAt=1780340137129" alt="XSTREAM MOVIES" class="nav-logo-img">' +
-         'XSTREAM MOVIES' +
+         'XSTRΞAM ⫸ MOVIES' +
        '</a>' +
         '<p>Discover exceptional movies and series from every genre, delivered through a seamless streaming experience designed for passionate film enthusiasts worldwide.</p>' +
       '</div>' +
