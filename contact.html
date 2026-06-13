@@ -23,7 +23,7 @@
     #live-chat-container.chat-visible {
       display: flex !important;
     }
-    #contact-form-card.form-hidden {
+    #contact-form-card.form-hidden, #request-form-card.form-hidden {
       display: none !important;
     }
     .chat-header {
@@ -223,16 +223,41 @@
       0%, 60%, 100% { transform: translateY(0); }
       30% { transform: translateY(-8px); }
     }
-    #live-chat-trigger {
+    .info-trigger {
       cursor: pointer !important;
       pointer-events: auto !important;
       position: relative;
       z-index: 1;
       transition: transform 0.2s, box-shadow 0.2s;
     }
-    #live-chat-trigger:hover {
+    .info-trigger:hover {
       transform: translateY(-4px);
       box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+    .request-form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 5px;
+    }
+    .close-form-btn {
+      background: var(--bg-tertiary, #2a2a4a);
+      border: 1px solid var(--border-color, rgba(255,255,255,0.1));
+      color: var(--text-secondary, #a0a0b0);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-size: 16px;
+    }
+    .close-form-btn:hover {
+      background: var(--error, #e74c3c);
+      color: #fff;
+      border-color: var(--error, #e74c3c);
     }
   </style>
 
@@ -240,12 +265,17 @@
   <script>
     window.chatSessionId = null;
     window.isBotTyping = false;
+    window.database = null;
+    window.auth = null;
+    window.firebaseInitialized = false;
 
     window.openLiveChat = function() {
       var formCard = document.getElementById('contact-form-card');
+      var reqCard = document.getElementById('request-form-card');
       var chatBox = document.getElementById('live-chat-container');
       
       if (formCard) formCard.classList.add('form-hidden');
+      if (reqCard) reqCard.classList.add('form-hidden');
       if (chatBox) chatBox.classList.add('chat-visible');
       
       if (typeof getOrCreateChatSession === 'function') {
@@ -255,8 +285,7 @@
             return;
           }
           
-          var db = firebase.database();
-          db.ref('live chat/' + sessionId + '/messages').orderByChild('timestamp').limitToLast(50).once('value', function(snap) {
+          window.database.ref('live chat/' + sessionId + '/messages').orderByChild('timestamp').limitToLast(50).once('value', function(snap) {
             var chatMessages = document.getElementById('chat-messages');
             if (chatMessages) chatMessages.innerHTML = '';
             
@@ -294,6 +323,24 @@
       
       if (formCard) formCard.classList.remove('form-hidden');
       if (chatBox) chatBox.classList.remove('chat-visible');
+    };
+
+    window.openRequestForm = function() {
+      var formCard = document.getElementById('contact-form-card');
+      var chatBox = document.getElementById('live-chat-container');
+      var reqCard = document.getElementById('request-form-card');
+      
+      if (formCard) formCard.classList.add('form-hidden');
+      if (chatBox) chatBox.classList.remove('chat-visible');
+      if (reqCard) reqCard.classList.remove('form-hidden');
+    };
+
+    window.closeRequestForm = function() {
+      var formCard = document.getElementById('contact-form-card');
+      var reqCard = document.getElementById('request-form-card');
+      
+      if (formCard) formCard.classList.remove('form-hidden');
+      if (reqCard) reqCard.classList.add('form-hidden');
     };
 
     window.sendChatMessage = function() {
@@ -351,7 +398,17 @@
           <a href="mailto:support@xstream.com" class="contact-info-link">support@xstream.com</a>
         </div>
 
-        <div class="contact-info-card" id="live-chat-trigger" onclick="openLiveChat()">
+        <!-- NEW: Request Content Trigger -->
+        <div class="contact-info-card info-trigger" onclick="openRequestForm()">
+          <div class="contact-info-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </div>
+          <h3>Request Content</h3>
+          <p>Can't find what you're looking for?</p>
+          <span class="contact-info-link" style="color: var(--accent);">Request Movie/Series →</span>
+        </div>
+
+        <div class="contact-info-card info-trigger" id="live-chat-trigger" onclick="openLiveChat()">
           <div class="contact-info-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           </div>
@@ -385,6 +442,7 @@
 
       <div class="contact-form-wrapper">
         
+        <!-- DEFAULT: Contact Form -->
         <div class="contact-form-card" id="contact-form-card">
           <h2 class="contact-form-title">Send Us a Message</h2>
           <p class="contact-form-subtitle">Fill out the form below and we'll get back to you as soon as possible.</p>
@@ -439,6 +497,61 @@
           </form>
         </div>
 
+        <!-- NEW: Movie/Series Request Form -->
+        <div class="contact-form-card form-hidden" id="request-form-card">
+          <div class="request-form-header">
+            <div>
+              <h2 class="contact-form-title" style="margin-bottom: 4px;">Request a Movie or Series</h2>
+              <p class="contact-form-subtitle">Can't find your favorite title? Let us know and we'll try to add it!</p>
+            </div>
+            <button class="close-form-btn" onclick="closeRequestForm()" title="Back to contact form">✕</button>
+          </div>
+
+          <form id="request-form" novalidate style="margin-top: 20px;">
+            <div class="form-group">
+              <label for="req-title">Title <span class="required">*</span></label>
+              <input type="text" id="req-title" class="input" placeholder="e.g., Inception, Breaking Bad" required>
+              <span class="form-error" id="req-title-error"></span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="req-type">Type <span class="required">*</span></label>
+                <select id="req-type" class="input" required>
+                  <option value="">Select type...</option>
+                  <option value="movie">Movie</option>
+                  <option value="series">TV Series</option>
+                  <option value="anime">Anime</option>
+                  <option value="documentary">Documentary</option>
+                </select>
+                <span class="form-error" id="req-type-error"></span>
+              </div>
+              <div class="form-group">
+                <label for="req-year">Release Year <span class="optional">(optional)</span></label>
+                <input type="number" id="req-year" class="input" placeholder="e.g., 2023" min="1900" max="2099">
+                <span class="form-error" id="req-year-error"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="req-link">IMDb / TMDB Link <span class="optional">(optional)</span></label>
+              <input type="url" id="req-link" class="input" placeholder="https://www.imdb.com/title/tt1375666/">
+              <span class="form-error" id="req-link-error"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="req-notes">Additional Notes <span class="optional">(optional)</span></label>
+              <textarea id="req-notes" class="input textarea" rows="3" placeholder="Any specific details (e.g., specific season, director, why you want it added)..."></textarea>
+            </div>
+
+            <button type="submit" id="req-submit" class="btn-accent btn-full">
+              <span class="btn-text">Submit Request</span>
+              <div class="btn-spinner"></div>
+            </button>
+          </form>
+        </div>
+
+        <!-- Live Chat Container -->
         <div id="live-chat-container">
           <div class="chat-header">
             <div class="chat-header-avatar">🤖</div>
@@ -469,33 +582,43 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-<script src="config.js"></script>
-<script src="js/app.js"></script>
+  <script src="config.js"></script>
+  <script src="js/app.js"></script>
   
   <script>
     /* ============================================
-       FIREBASE CONFIG + CHAT FUNCTIONS
+       FIREBASE INITIALIZATION FROM CONFIG.JS
        ============================================ */
     
-    var database, auth;
-
-    try {
-      if (!firebase.apps.length) {
-        firebase.initializeApp({
-          apiKey: "AIzaSyCvrWHOHXmVmHkl451aQA6XFCWy7xA9jFw",
-          authDomain: "xstream-9f21e.firebaseapp.com",
-          projectId: "xstream-9f21e",
-          storageBucket: "xstream-9f21e.firebasestorage.app",
-          messagingSenderId: "179015046758",
-          appId: "1:179015046758:web:e7da8143826b59b49e7fa7",
-          databaseURL: "https://xstream-9f21e-default-rtdb.firebaseio.com"
-        });
+    function initializeFirebaseFromConfig() {
+      try {
+        if (typeof firebaseConfig !== 'undefined' && firebaseConfig) {
+          if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            console.log('Firebase initialized from config.js');
+          }
+          window.database = firebase.database();
+          window.auth = firebase.auth();
+          window.firebaseInitialized = true;
+          
+          window.auth.onAuthStateChanged(function(user) {
+            console.log('Auth state changed:', user ? user.uid : 'not logged in');
+          });
+          
+          return true;
+        } else {
+          console.error('Firebase config not found in config.js');
+          return false;
+        }
+      } catch(e) {
+        console.error('Firebase init error:', e);
+        return false;
       }
-      database = firebase.database();
-      auth = firebase.auth();
-    } catch(e) {
-      console.error('Firebase init error:', e);
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeFirebaseFromConfig();
+    });
 
     /* Bot Responses */
     var botResponses = {
@@ -519,13 +642,16 @@
 
     /* Chat Helper Functions */
     function getOrCreateChatSession(callback) {
-      if (!database) { callback(null); return; }
+      if (!window.database) { 
+        if (initializeFirebaseFromConfig()) {} 
+        else { callback(null); return; }
+      }
       
-      var userId = (auth && auth.currentUser) ? auth.currentUser.uid : 'guest';
+      var userId = (window.auth && window.auth.currentUser) ? window.auth.currentUser.uid : 'guest';
       var savedSession = localStorage.getItem('xstream_chat_session');
       
       if (savedSession) {
-        database.ref('live chat/' + savedSession).once('value').then(function(snap) {
+        window.database.ref('live chat/' + savedSession).once('value').then(function(snap) {
           if (snap.exists()) {
             window.chatSessionId = savedSession;
             callback(savedSession);
@@ -543,14 +669,14 @@
     function createChatSession(userId, callback) {
       var sessionData = {
         userId: userId,
-        userName: (auth && auth.currentUser) ? (auth.currentUser.displayName || 'User') : 'Guest',
-        userEmail: (auth && auth.currentUser) ? (auth.currentUser.email || '') : '',
+        userName: (window.auth && window.auth.currentUser) ? (window.auth.currentUser.displayName || 'User') : 'Guest',
+        userEmail: (window.auth && window.auth.currentUser) ? (window.auth.currentUser.email || '') : '',
         createdAt: Date.now(),
         lastActivity: Date.now(),
         status: 'active'
       };
 
-      database.ref('live chat').push(sessionData).then(function(ref) {
+      window.database.ref('live chat').push(sessionData).then(function(ref) {
         window.chatSessionId = ref.key;
         localStorage.setItem('xstream_chat_session', ref.key);
         callback(ref.key);
@@ -562,29 +688,24 @@
 
     function addChatMessage(text, sender, saveToDb) {
       if (typeof saveToDb === 'undefined') saveToDb = true;
-      
       var chatMessages = document.getElementById('chat-messages');
       if (!chatMessages) return;
       
       var msgDiv = document.createElement('div');
       msgDiv.className = 'chat-msg ' + sender;
-      
       var now = new Date();
       var timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       var avatarContent = sender === 'bot' ? '🤖' : '👤';
-      
       msgDiv.innerHTML = '<div class="chat-msg-avatar">' + avatarContent + '</div><div><div class="chat-msg-bubble">' + text.replace(/\n/g, '<br>') + '</div><div class="chat-msg-time">' + timeStr + '</div></div>';
       
       chatMessages.appendChild(msgDiv);
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
-      if (saveToDb && window.chatSessionId && database) {
-        database.ref('live chat/' + window.chatSessionId + '/messages').push({
-          text: text,
-          sender: sender,
-          timestamp: Date.now()
+      if (saveToDb && window.chatSessionId && window.database) {
+        window.database.ref('live chat/' + window.chatSessionId + '/messages').push({
+          text: text, sender: sender, timestamp: Date.now()
         });
-        database.ref('live chat/' + window.chatSessionId).update({ lastActivity: Date.now() });
+        window.database.ref('live chat/' + window.chatSessionId).update({ lastActivity: Date.now() });
       }
     }
 
@@ -592,7 +713,6 @@
       window.isBotTyping = true;
       var chatMessages = document.getElementById('chat-messages');
       if (!chatMessages) return;
-      
       var typingDiv = document.createElement('div');
       typingDiv.className = 'chat-msg bot';
       typingDiv.id = 'typing-indicator';
@@ -610,10 +730,8 @@
     function showChatSuggestions(setName) {
       var suggestionsEl = document.getElementById('chat-suggestions');
       if (!suggestionsEl) return;
-      
       var suggestions = suggestionSets[setName] || suggestionSets.initial;
       suggestionsEl.innerHTML = '';
-      
       for (var i = 0; i < suggestions.length; i++) {
         (function(text) {
           var btn = document.createElement('button');
@@ -630,63 +748,30 @@
 
     function getBotResponse(userMsg) {
       var msg = userMsg.toLowerCase();
-      
-      if (msg.includes('movie') || msg.includes('film') || msg.includes('show') || msg.includes('watch') || msg.includes('genre') || msg.includes('recommend')) {
-        showChatSuggestions('movies');
-        return botResponses.movies;
-      }
-      if (msg.includes('account') || msg.includes('login') || msg.includes('password') || msg.includes('sign in') || msg.includes('profile') || msg.includes('email change') || msg.includes('delete account')) {
-        showChatSuggestions('account');
-        return botResponses.account;
-      }
-      if (msg.includes('play') || msg.includes('buffer') || msg.includes('load') || msg.includes('video') || msg.includes('stream') || msg.includes('sound') || msg.includes('subtitle') || msg.includes('audio')) {
-        showChatSuggestions('playback');
-        return botResponses.playback;
-      }
-      if (msg.includes('subscri') || msg.includes('plan') || msg.includes('price') || msg.includes('payment') || msg.includes('billing') || msg.includes('premium') || msg.includes('trial')) {
+      if (msg.includes('movie') || msg.includes('film') || msg.includes('show') || msg.includes('watch') || msg.includes('genre') || msg.includes('recommend')) { showChatSuggestions('movies'); return botResponses.movies; }
+      if (msg.includes('account') || msg.includes('login') || msg.includes('password') || msg.includes('sign in') || msg.includes('profile') || msg.includes('email change') || msg.includes('delete account')) { showChatSuggestions('account'); return botResponses.account; }
+      if (msg.includes('play') || msg.includes('buffer') || msg.includes('load') || msg.includes('video') || msg.includes('stream') || msg.includes('sound') || msg.includes('subtitle') || msg.includes('audio')) { showChatSuggestions('playback'); return botResponses.playback; }
+      if (msg.includes('subscri') || msg.includes('plan') || msg.includes('price') || msg.includes('payment') || msg.includes('billing') || msg.includes('premium') || msg.includes('trial')) { showChatSuggestions('initial'); return botResponses.subscription; }
+      if (msg.includes('help') || msg.includes('assist') || msg.includes('support') || msg.includes('what can')) { showChatSuggestions('initial'); return botResponses.help; }
+      if (msg.includes('contact') || msg.includes('human') || msg.includes('agent') || msg.includes('real person') || msg.includes('talk to')) { showChatSuggestions('initial'); return botResponses.contact; }
+      if (msg.includes('download') || msg.includes('offline')) { showChatSuggestions('initial'); return botResponses.download; }
+      if (msg.includes('device') || msg.includes('tv') || msg.includes('phone') || msg.includes('app') || msg.includes('browser') || msg.includes('console')) { showChatSuggestions('initial'); return botResponses.devices; }
+      if (msg.includes('request') || msg.includes('add movie') || msg.includes('missing')) {
         showChatSuggestions('initial');
-        return botResponses.subscription;
+        return "📝 Want to request a specific movie or series? Click on the 'Request Content' card on the left side of this page, and fill out the quick form! We do our best to add highly requested titles.";
       }
-      if (msg.includes('help') || msg.includes('assist') || msg.includes('support') || msg.includes('what can')) {
-        showChatSuggestions('initial');
-        return botResponses.help;
-      }
-      if (msg.includes('contact') || msg.includes('human') || msg.includes('agent') || msg.includes('real person') || msg.includes('talk to')) {
-        showChatSuggestions('initial');
-        return botResponses.contact;
-      }
-      if (msg.includes('download') || msg.includes('offline')) {
-        showChatSuggestions('initial');
-        return botResponses.download;
-      }
-      if (msg.includes('device') || msg.includes('tv') || msg.includes('phone') || msg.includes('app') || msg.includes('browser') || msg.includes('console')) {
-        showChatSuggestions('initial');
-        return botResponses.devices;
-      }
-      if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey') || msg.includes('good morning') || msg.includes('good evening')) {
-        showChatSuggestions('initial');
-        return "Hello! 😊 How can I assist you today?";
-      }
-      if (msg.includes('thank') || msg.includes('thanks')) {
-        document.getElementById('chat-suggestions').innerHTML = '';
-        return "You're welcome! 😊 Anything else I can help with?";
-      }
-      if (msg.includes('bye') || msg.includes('goodbye')) {
-        document.getElementById('chat-suggestions').innerHTML = '';
-        return "Goodbye! 👋 Have a great day!";
-      }
-      
-      showChatSuggestions('initial');
-      return botResponses.default;
+      if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey') || msg.includes('good morning') || msg.includes('good evening')) { showChatSuggestions('initial'); return "Hello! 😊 How can I assist you today?"; }
+      if (msg.includes('thank') || msg.includes('thanks')) { document.getElementById('chat-suggestions').innerHTML = ''; return "You're welcome! 😊 Anything else I can help with?"; }
+      if (msg.includes('bye') || msg.includes('goodbye')) { document.getElementById('chat-suggestions').innerHTML = ''; return "Goodbye! 👋 Have a great day!"; }
+      showChatSuggestions('initial'); return botResponses.default;
     }
 
     /* ============================================
-       CONTACT FORM
+       CONTACT FORM LOGIC
        ============================================ */
     (function() {
       var form = document.getElementById('contact-form');
       if (!form) return;
-
       var messageInput = document.getElementById('contact-message');
       var messageCount = document.getElementById('contact-message-count');
 
@@ -701,21 +786,14 @@
       var inputs = form.querySelectorAll('.input');
       for (var i = 0; i < inputs.length; i++) {
         (function(input) {
-          input.addEventListener('input', function() {
-            var errorEl = document.getElementById(input.id + '-error');
-            if (errorEl) errorEl.textContent = '';
-            input.style.borderColor = '';
-          });
+          input.addEventListener('input', function() { document.getElementById(input.id + '-error').textContent = ''; input.style.borderColor = ''; });
         })(inputs[i]);
       }
 
       form.addEventListener('submit', function(e) {
         e.preventDefault();
-
-        var errors = form.querySelectorAll('.form-error');
-        for (var j = 0; j < errors.length; j++) errors[j].textContent = '';
-        var allInputs = form.querySelectorAll('.input');
-        for (var j = 0; j < allInputs.length; j++) allInputs[j].style.borderColor = '';
+        var errors = form.querySelectorAll('.form-error'); for (var j = 0; j < errors.length; j++) errors[j].textContent = '';
+        var allInputs = form.querySelectorAll('.input'); for (var j = 0; j < allInputs.length; j++) allInputs[j].style.borderColor = '';
 
         var name = document.getElementById('contact-name').value.trim();
         var email = document.getElementById('contact-email').value.trim();
@@ -724,84 +802,112 @@
         var message = document.getElementById('contact-message').value.trim();
         var valid = true;
 
-        if (!name || name.length < 2) {
-          document.getElementById('contact-name-error').textContent = 'Please enter your full name';
-          document.getElementById('contact-name').style.borderColor = 'var(--error, #e74c3c)';
-          valid = false;
-        }
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          document.getElementById('contact-email-error').textContent = 'Please enter a valid email address';
-          document.getElementById('contact-email').style.borderColor = 'var(--error, #e74c3c)';
-          valid = false;
-        }
-        if (!subject) {
-          document.getElementById('contact-subject-error').textContent = 'Please select a subject';
-          document.getElementById('contact-subject').style.borderColor = 'var(--error, #e74c3c)';
-          valid = false;
-        }
-        if (videoLink && !/^https?:\/\/.+/i.test(videoLink)) {
-          document.getElementById('contact-video-link-error').textContent = 'Please enter a valid URL';
-          document.getElementById('contact-video-link').style.borderColor = 'var(--error, #e74c3c)';
-          valid = false;
-        }
-        if (!message || message.length < 10) {
-          document.getElementById('contact-message-error').textContent = 'Please write at least 10 characters';
-          document.getElementById('contact-message').style.borderColor = 'var(--error, #e74c3c)';
-          valid = false;
-        }
-        if (message.length > 1000) {
-          document.getElementById('contact-message-error').textContent = 'Message must be under 1000 characters';
-          document.getElementById('contact-message').style.borderColor = 'var(--error, #e74c3c)';
-          valid = false;
-        }
+        if (!name || name.length < 2) { document.getElementById('contact-name-error').textContent = 'Please enter your full name'; document.getElementById('contact-name').style.borderColor = 'var(--error, #e74c3c)'; valid = false; }
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { document.getElementById('contact-email-error').textContent = 'Please enter a valid email address'; document.getElementById('contact-email').style.borderColor = 'var(--error, #e74c3c)'; valid = false; }
+        if (!subject) { document.getElementById('contact-subject-error').textContent = 'Please select a subject'; document.getElementById('contact-subject').style.borderColor = 'var(--error, #e74c3c)'; valid = false; }
+        if (videoLink && !/^https?:\/\/.+/i.test(videoLink)) { document.getElementById('contact-video-link-error').textContent = 'Please enter a valid URL'; document.getElementById('contact-video-link').style.borderColor = 'var(--error, #e74c3c)'; valid = false; }
+        if (!message || message.length < 10) { document.getElementById('contact-message-error').textContent = 'Please write at least 10 characters'; document.getElementById('contact-message').style.borderColor = 'var(--error, #e74c3c)'; valid = false; }
+        if (message.length > 1000) { document.getElementById('contact-message-error').textContent = 'Message must be under 1000 characters'; document.getElementById('contact-message').style.borderColor = 'var(--error, #e74c3c)'; valid = false; }
+        
         if (!valid) return;
-        if (!database) { alert('Firebase not initialized'); return; }
+        if (!window.database && !initializeFirebaseFromConfig()) { alert('Firebase not initialized. Please check your config.js file.'); return; }
 
-        var btn = document.getElementById('contact-submit');
-        var btnText = btn.querySelector('.btn-text');
-        var btnSpinner = btn.querySelector('.btn-spinner');
-        btn.disabled = true;
-        if (btnText) btnText.style.opacity = '0';
-        if (btnSpinner) btnSpinner.style.display = 'block';
+        var btn = document.getElementById('contact-submit'); var btnText = btn.querySelector('.btn-text'); var btnSpinner = btn.querySelector('.btn-spinner');
+        btn.disabled = true; if (btnText) btnText.style.opacity = '0'; if (btnSpinner) btnSpinner.style.display = 'block';
 
-        var userId = 'guest';
-        var userName = name;
-        var userEmail = email;
-        if (auth && auth.currentUser) {
-          userId = auth.currentUser.uid;
-          if (auth.currentUser.displayName) userName = auth.currentUser.displayName;
-          if (auth.currentUser.email) userEmail = auth.currentUser.email;
+        var userId = 'guest', userName = name, userEmail = email;
+        if (window.auth && window.auth.currentUser) { userId = window.auth.currentUser.uid; if (window.auth.currentUser.displayName) userName = window.auth.currentUser.displayName; if (window.auth.currentUser.email) userEmail = window.auth.currentUser.email; }
+
+        window.database.ref('contact us').push({
+          fullName: userName, emailAddress: userEmail, subject: subject, relatedVideoLink: videoLink || null, message: message, userId: userId, status: 'open', createdAt: Date.now(), updatedAt: Date.now()
+        }).then(function() {
+          if (btnText) btnText.textContent = 'Message Sent!'; if (btnSpinner) btnSpinner.style.display = 'none'; if (btnText) btnText.style.opacity = '1'; btn.style.background = '#27ae60';
+          if (typeof showToast === 'function') showToast('Message sent successfully!', 'success');
+          setTimeout(function() { form.reset(); if (messageCount) messageCount.textContent = '0'; if (btnText) btnText.textContent = 'Send Message'; btn.style.background = ''; btn.disabled = false; }, 3000);
+        }).catch(function(err) {
+          console.error('Contact form error:', err); if (btnSpinner) btnSpinner.style.display = 'none'; if (btnText) btnText.style.opacity = '1'; btn.disabled = false;
+          if (typeof showToast === 'function') showToast('Failed to send message.', 'error'); else alert('Failed to send message.');
+        });
+      });
+    })();
+
+    /* ============================================
+       NEW: MOVIE/SERIES REQUEST FORM LOGIC
+       ============================================ */
+    (function() {
+      var form = document.getElementById('request-form');
+      if (!form) return;
+
+      var inputs = form.querySelectorAll('.input');
+      for (var i = 0; i < inputs.length; i++) {
+        (function(input) {
+          input.addEventListener('input', function() { document.getElementById(input.id + '-error').textContent = ''; input.style.borderColor = ''; });
+        })(inputs[i]);
+      }
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Clear errors
+        var errors = form.querySelectorAll('.form-error'); for (var j = 0; j < errors.length; j++) errors[j].textContent = '';
+        var allInputs = form.querySelectorAll('.input'); for (var j = 0; j < allInputs.length; j++) allInputs[j].style.borderColor = '';
+
+        var title = document.getElementById('req-title').value.trim();
+        var type = document.getElementById('req-type').value;
+        var year = document.getElementById('req-year').value.trim();
+        var link = document.getElementById('req-link').value.trim();
+        var notes = document.getElementById('req-notes').value.trim();
+        var valid = true;
+
+        if (!title || title.length < 2) { document.getElementById('req-title-error').textContent = 'Please enter the title'; document.getElementById('req-title').style.borderColor = 'var(--error, #e74c3c)'; valid = false; }
+        if (!type) { document.getElementById('req-type-error').textContent = 'Please select a type'; document.getElementById('req-type').style.borderColor = 'var(--error, #e74c3c)'; valid = false; }
+        if (year && (isNaN(year) || year < 1900 || year > 2099)) { document.getElementById('req-year-error').textContent = 'Enter a valid year'; document.getElementById('req-year').style.borderColor = 'var(--error, #e74c3c)'; valid = false; }
+        if (link && !/^https?:\/\/.+/i.test(link)) { document.getElementById('req-link-error').textContent = 'Please enter a valid URL'; document.getElementById('req-link').style.borderColor = 'var(--error, #e74c3c)'; valid = false; }
+        
+        if (!valid) return;
+        if (!window.database && !initializeFirebaseFromConfig()) { alert('Firebase not initialized.'); return; }
+
+        var btn = document.getElementById('req-submit'); var btnText = btn.querySelector('.btn-text'); var btnSpinner = btn.querySelector('.btn-spinner');
+        btn.disabled = true; if (btnText) btnText.style.opacity = '0'; if (btnSpinner) btnSpinner.style.display = 'block';
+
+        var userId = 'guest', userName = 'Guest', userEmail = '';
+        if (window.auth && window.auth.currentUser) { 
+          userId = window.auth.currentUser.uid; 
+          if (window.auth.currentUser.displayName) userName = window.auth.currentUser.displayName; 
+          if (window.auth.currentUser.email) userEmail = window.auth.currentUser.email; 
         }
 
-        database.ref('contact us').push({
-          fullName: userName,
-          emailAddress: userEmail,
-          subject: subject,
-          relatedVideoLink: videoLink || null,
-          message: message,
-          userId: userId,
-          status: 'open',
-          createdAt: Date.now(),
-          updatedAt: Date.now()
+        // Save to "movie requests" node
+        window.database.ref('movie requests').push({
+          title: title,
+          type: type,
+          year: year ? parseInt(year) : null,
+          link: link || null,
+          notes: notes || null,
+          requestedBy: userId,
+          requestedByName: userName,
+          requestedByEmail: userEmail,
+          status: 'pending',
+          votes: 1, // Initial vote by the requester
+          createdAt: Date.now()
         }).then(function() {
-          if (btnText) btnText.textContent = 'Message Sent!';
-          if (btnSpinner) btnSpinner.style.display = 'none';
-          if (btnText) btnText.style.opacity = '1';
-          btn.style.background = '#27ae60';
-          if (typeof showToast === 'function') showToast('Message sent successfully!', 'success');
-          setTimeout(function() {
-            form.reset();
-            if (messageCount) messageCount.textContent = '0';
-            if (btnText) btnText.textContent = 'Send Message';
-            btn.style.background = '';
-            btn.disabled = false;
+          if (btnText) btnText.textContent = 'Request Submitted!'; if (btnSpinner) btnSpinner.style.display = 'none'; if (btnText) btnText.style.opacity = '1'; btn.style.background = '#27ae60';
+          if (typeof showToast === 'function') showToast('Request submitted successfully! We will look into it.', 'success');
+          
+          setTimeout(function() { 
+            form.reset(); 
+            if (btnText) btnText.textContent = 'Submit Request'; 
+            btn.style.background = ''; 
+            btn.disabled = false; 
+            // Optionally switch back to contact form
+            // window.closeRequestForm();
           }, 3000);
         }).catch(function(err) {
-          console.error('Contact form error:', err);
-          if (btnSpinner) btnSpinner.style.display = 'none';
-          if (btnText) btnText.style.opacity = '1';
+          console.error('Request form error:', err); 
+          if (btnSpinner) btnSpinner.style.display = 'none'; 
+          if (btnText) btnText.style.opacity = '1'; 
           btn.disabled = false;
-          if (typeof showToast === 'function') showToast('Failed to send message.', 'error');
+          if (typeof showToast === 'function') showToast('Failed to submit request.', 'error'); else alert('Failed to submit request.');
         });
       });
     })();
@@ -810,17 +916,9 @@
     (function() {
       var chatInput = document.getElementById('chat-input');
       var chatSendBtn = document.getElementById('chat-send-btn');
-      
       if (chatInput) {
-        chatInput.addEventListener('keydown', function(e) {
-          if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendChatMessage();
-          }
-        });
-        chatInput.addEventListener('input', function() {
-          if (chatSendBtn) chatSendBtn.disabled = !chatInput.value.trim();
-        });
+        chatInput.addEventListener('keydown', function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); } });
+        chatInput.addEventListener('input', function() { if (chatSendBtn) chatSendBtn.disabled = !chatInput.value.trim(); });
       }
     })();
   </script>
